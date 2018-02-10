@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/poulfoged/redis-inside/master/icon.png) &nbsp; ![](https://ci.appveyor.com/api/projects/status/5m2rpq1gokv0geu3?svg=true) &nbsp; ![](http://img.shields.io/nuget/v/redis-inside.svg?style=flat)
+![](https://raw.githubusercontent.com/poulfoged/redis-inside/master/icon.png) &nbsp; ![](http://img.shields.io/nuget/v/Wikiled.Redis.Inside.svg?style=flat)
 #Redis Inside  
 
 Run integration tests against Redis without having to start/install an instance.

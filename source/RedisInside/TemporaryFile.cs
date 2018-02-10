@@ -6,46 +6,36 @@ namespace RedisInside
 {
     public class TemporaryFile : IDisposable
     {
-        private readonly FileInfo _fileInfo;
-        private bool _disposed;
+        private bool disposed;
 
         public TemporaryFile(string extension = "tmp")
         {
-            _fileInfo = new FileInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + "." + extension));
+            Info = new FileInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + "." + extension));
         }
 
-        public TemporaryFile(Stream stream, string extension = "tmp") : this(extension)
+        public TemporaryFile(Stream stream, string extension = "tmp")
+            : this(extension)
         {
             using (stream)
-            using (var destination = _fileInfo.OpenWrite())
+            using (var destination = Info.OpenWrite())
+            {
                 stream.CopyTo(destination);
-        }
-
-        public FileInfo Info 
-        {
-            get { return _fileInfo; }
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-            try
-            {
-                if (disposing)
-                    _fileInfo.Delete();
             }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex);
-            }
-            _disposed = true;
-
         }
 
-        ~TemporaryFile()
+        public FileInfo Info { get; }
+
+        public void CopyTo(Stream result)
         {
-            Dispose(false);
+            using (var stream = Info.OpenRead())
+            {
+                stream.CopyTo(result);
+            }
+
+            if (result.CanSeek)
+            {
+                result.Seek(0, SeekOrigin.Begin);
+            }
         }
 
         public void Dispose()
@@ -54,13 +44,26 @@ namespace RedisInside
             GC.SuppressFinalize(this);
         }
 
-        public void CopyTo(Stream result)
+        protected virtual void Dispose(bool disposing)
         {
-            using (var stream = _fileInfo.OpenRead())
-                stream.CopyTo(result);
+            if (disposed)
+            {
+                return;
+            }
 
-            if (result.CanSeek)
-                result.Seek(0, SeekOrigin.Begin);
+            try
+            {
+                if (disposing)
+                {
+                    Info.Delete();
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            disposed = true;
         }
     }
 }

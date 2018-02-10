@@ -11,7 +11,7 @@ namespace RedisInside.Tests
     public class RedisTests
     {
         [Test]
-        public void Can_configure()
+        public void CanConfigure()
         {
             using (var redis = new Redis(i => i.Port(1234).LogTo(message => Trace.WriteLine(message))))
             {
@@ -21,22 +21,20 @@ namespace RedisInside.Tests
         }
 
         [Test]
-        public void Can_start()
+        public void CanStart()
         {
             using (var redis = new Redis())
             using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
             {
                 client.GetDatabase().StringSet("key", "value");
-
                 var value = client.GetDatabase().StringGet("key");
-
                 Assert.That(value.ToString(), Is.EqualTo("value"));
             }
 
         }
 
         [Test]
-        public void Can_start_multiple()
+        public void CanStartMultiple()
         {
             using (var redis = new Redis())
             using (var redis2 = new Redis())
@@ -50,7 +48,7 @@ namespace RedisInside.Tests
         }
 
         [Test]
-        public async Task Can_start_slave()
+        public async Task CanStartSlave()
         {
 
             using (var redis = new Redis())
@@ -62,17 +60,19 @@ namespace RedisInside.Tests
                 config.EndPoints.Add(redis.Endpoint);
                 config.EndPoints.Add(redis2.Endpoint);
                 using (var client = ConnectionMultiplexer.Connect(config))
-                    await client.GetServer(redis.Endpoint).SlaveOfAsync(redis2.Endpoint);
+                {
+                    await client.GetServer(redis.Endpoint).SlaveOfAsync(redis2.Endpoint).ConfigureAwait(false);
+                }
 
                 // new single-node client
                 string actualValue;
                 using (var client = ConnectionMultiplexer.Connect(redis2.Endpoint.ToString()))
                 {
 
-                    await client.GetDatabase().StringSetAsync("key", "value");
+                    await client.GetDatabase().StringSetAsync("key", "value").ConfigureAwait(false);
 
                     ////Act
-                    actualValue = await client.GetDatabase().StringGetAsync("key");
+                    actualValue = await client.GetDatabase().StringGetAsync("key").ConfigureAwait(false);
                 }
 
                 ////Assert
