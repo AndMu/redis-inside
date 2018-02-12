@@ -10,16 +10,19 @@ namespace RedisInside
 
         public TemporaryFile(string extension = "tmp")
         {
-            Info = new FileInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + "." + extension));
+            Info = new FileInfo(Path.Combine(Path.GetTempPath(), "Wikiled.RedisInside" + "." + extension));
         }
 
         public TemporaryFile(Stream stream, string extension = "tmp")
             : this(extension)
         {
-            using (stream)
-            using (var destination = Info.OpenWrite())
+            if (!Info.Exists)
             {
-                stream.CopyTo(destination);
+                using (stream)
+                using (var destination = Info.OpenWrite())
+                {
+                    stream.CopyTo(destination);
+                }
             }
         }
 
@@ -36,18 +39,6 @@ namespace RedisInside
             if (disposed)
             {
                 return;
-            }
-
-            try
-            {
-                if (disposing)
-                {
-                    Info.Delete();
-                }
-            }
-            catch(Exception ex)
-            {
-                Debug.WriteLine(ex);
             }
 
             disposed = true;

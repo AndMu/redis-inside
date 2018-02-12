@@ -21,6 +21,7 @@ namespace RedisInside.Tests
         public void CanStartExternal()
         {
             using (var redis = new Redis(item => item.UseExternalIp()))
+            using (var redis2 = new Redis(item => item.UseExternalIp()))
             using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
             {
                 client.GetDatabase().StringSet("key", "value");

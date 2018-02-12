@@ -24,11 +24,6 @@ namespace RedisInside
             configuration?.Invoke(config);
 
             executable = new TemporaryFile(GetType().GetTypeInfo().Assembly.GetManifestResourceStream("RedisInside.Executables.redis-server.exe"), "exe");
-            if (config.IsExternalIp)
-            {
-                EnablePort(true);
-            }
-
             
             var processStartInfo = new ProcessStartInfo(" \"" + executable.Info.FullName + " \"")
                                    {
@@ -55,37 +50,6 @@ namespace RedisInside
             GC.SuppressFinalize(this);
         }
 
-        public void EnablePort(bool enable)
-        {
-            try
-            {
-                config.Logger($"EnablePort: {enable}");
-
-                string command = enable
-                                     ? $"netsh firewall add allowedprogram \"{executable.Info.FullName}\" Redis-Inside ENABLE"
-                                     : $"netsh firewall delete allowedprogram \"{executable.Info.FullName}\"";
-                ProcessStartInfo procStartInfo =
-                    new ProcessStartInfo("cmd", "/c " + command);
-
-                procStartInfo.RedirectStandardOutput = true;
-                procStartInfo.UseShellExecute = false;
-                procStartInfo.CreateNoWindow = true;
-
-                Process proc = new Process();
-                proc.StartInfo = procStartInfo;
-                proc.Start();
-
-                // Get the output into a string
-                string result = proc.StandardOutput.ReadToEnd();
-
-                // Display the command output.
-                config.Logger(result);
-            }
-            catch (Exception ex)
-            {
-                config.Logger(ex.Message);
-            }
-        }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -99,11 +63,6 @@ namespace RedisInside
                 process.CancelOutputRead();
                 process.Kill();
                 process.WaitForExit(2000);
-
-                if (config.IsExternalIp)
-                {
-                    EnablePort(false);
-                }
 
                 if (disposing)
                 {
