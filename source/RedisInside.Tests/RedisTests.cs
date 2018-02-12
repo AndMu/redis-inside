@@ -18,19 +18,6 @@ namespace RedisInside.Tests
         }
 
         [Test]
-        public void CanStartExternal()
-        {
-            using (var redis = new Redis(item => item.UseExternalIp()))
-            using (var redis2 = new Redis(item => item.UseExternalIp()))
-            using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
-            {
-                client.GetDatabase().StringSet("key", "value");
-                var value = client.GetDatabase().StringGet("key");
-                Assert.That(value.ToString(), Is.EqualTo("value"));
-            }
-        }
-
-        [Test]
         public void CanStart()
         {
             using (var redis = new Redis())
