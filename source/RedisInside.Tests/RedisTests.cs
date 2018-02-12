@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using StackExchange.Redis;
@@ -17,20 +15,30 @@ namespace RedisInside.Tests
             {
                 Assert.That(redis.Endpoint.ToString().EndsWith("1234"));
             }
-
         }
 
         [Test]
-        public void CanStart()
+        public void CanStartExternal()
         {
-            using (var redis = new Redis())
+            using (var redis = new Redis(item => item.UseExternalIp()))
             using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
             {
                 client.GetDatabase().StringSet("key", "value");
                 var value = client.GetDatabase().StringGet("key");
                 Assert.That(value.ToString(), Is.EqualTo("value"));
             }
+        }
 
+        [Test]
+        public void CanStart()
+        {
+            using (var redis = new Redis())
+                using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
+                {
+                    client.GetDatabase().StringSet("key", "value");
+                    var value = client.GetDatabase().StringGet("key");
+                    Assert.That(value.ToString(), Is.EqualTo("value"));
+                }
         }
 
         [Test]
@@ -71,11 +79,9 @@ namespace RedisInside.Tests
 
                     await client.GetDatabase().StringSetAsync("key", "value").ConfigureAwait(false);
 
-                    ////Act
                     actualValue = await client.GetDatabase().StringGetAsync("key").ConfigureAwait(false);
                 }
 
-                ////Assert
                 Assert.That(actualValue, Is.EqualTo("value"));
             }
         }

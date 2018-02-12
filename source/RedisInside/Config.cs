@@ -10,31 +10,41 @@ namespace RedisInside
 
         private static readonly ConcurrentDictionary<int, byte> usedPorts = new ConcurrentDictionary<int, byte>();
 
-        internal Action<string> logger;
-
-        internal int port;
-
         public Config()
         {
             do
             {
-                port = random.Next(49152, 65535 + 1);
+                SelectedPort = random.Next(49152, 65535 + 1);
             }
-            while (usedPorts.ContainsKey(port));
+            while (usedPorts.ContainsKey(SelectedPort));
 
-            usedPorts.AddOrUpdate(port, i => byte.MinValue, (i, b) => byte.MinValue);
-            logger = message => Debug.WriteLine(message);
+            usedPorts.AddOrUpdate(SelectedPort, i => byte.MinValue, (i, b) => byte.MinValue);
+            Logger = message => Debug.WriteLine(message);
+        }
+
+        public Action<string> Logger { get; private set; }
+
+        public int SelectedPort { get; private set; }
+
+        public bool IsExternalIp { get; private set; }
+
+        public string Host => IsExternalIp ? "0.0.0.0" : "127.0.0.1";
+
+        public IConfig UseExternalIp()
+        {
+            IsExternalIp = true;
+            return this;
         }
 
         public IConfig LogTo(Action<string> logFunction)
         {
-            logger = logFunction;
+            Logger = logFunction;
             return this;
         }
 
         public IConfig Port(int portNumber)
         {
-            port = portNumber;
+            SelectedPort = portNumber;
             return this;
         }
     }

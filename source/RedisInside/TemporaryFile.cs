@@ -25,19 +25,6 @@ namespace RedisInside
 
         public FileInfo Info { get; }
 
-        public void CopyTo(Stream result)
-        {
-            using (var stream = Info.OpenRead())
-            {
-                stream.CopyTo(result);
-            }
-
-            if (result.CanSeek)
-            {
-                result.Seek(0, SeekOrigin.Begin);
-            }
-        }
-
         public void Dispose()
         {
             Dispose(true);
