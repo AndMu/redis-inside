@@ -30,9 +30,27 @@ namespace RedisInside
 
         public string Host => IsExternalIp ? "0.0.0.0" : "127.0.0.1";
 
+        public bool IsWithPersistence { get; private set; }
+
+        public string PersistenceFile { get; private set; }
+
+        public string Persistence => !IsWithPersistence ? "persistence-available no" : $"dbfilename {PersistenceFile}";
+
         public IConfig UseExternalIp()
         {
             IsExternalIp = true;
+            return this;
+        }
+
+        public IConfig WithPersistence(string fileName = null)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                fileName = Guid.NewGuid().ToString("N") + ".db";
+            }
+
+            PersistenceFile = fileName;
+            IsWithPersistence = true;
             return this;
         }
 

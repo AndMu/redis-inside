@@ -11,5 +11,7 @@ namespace RedisInside
         IConfig Port(int portNumber);
 
         IConfig LogTo(Action<string> logFunction);
+
+        IConfig WithPersistence(string fileName = null);
     }
 }

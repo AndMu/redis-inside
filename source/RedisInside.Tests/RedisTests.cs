@@ -34,12 +34,25 @@ namespace RedisInside.Tests
         public void CanStart()
         {
             using (var redis = new Redis())
-                using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
-                {
-                    client.GetDatabase().StringSet("key", "value");
-                    var value = client.GetDatabase().StringGet("key");
-                    Assert.That(value.ToString(), Is.EqualTo("value"));
-                }
+            using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
+            {
+                client.GetDatabase().StringSet("key", "value");
+                var value = client.GetDatabase().StringGet("key");
+                Assert.That(value.ToString(), Is.EqualTo("value"));
+            }
+        }
+
+        [TestCase(null)]
+        [TestCase("dump1")]
+        public void CanStartWithPersistence(string fileName)
+        {
+            using (var redis = new Redis(i => i.WithPersistence(fileName)))
+            using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
+            {
+                client.GetDatabase().StringSet("key", "value");
+                var value = client.GetDatabase().StringGet("key");
+                Assert.That(value.ToString(), Is.EqualTo("value"));
+            }
         }
 
         [Test]

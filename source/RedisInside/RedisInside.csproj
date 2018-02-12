@@ -27,14 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="StackExchange.Redis">
-      <HintPath>..\..\..\..\..\Users\Andrius\.nuget\packages\stackexchange.redis\1.2.6\lib\net46\StackExchange.Redis.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
