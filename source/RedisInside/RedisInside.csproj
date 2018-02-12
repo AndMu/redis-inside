@@ -6,12 +6,12 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>RedisInside</AssemblyName>
+    <AssemblyName>Wikiled.RedisInside</AssemblyName>
     <Authors>Wikiled</Authors>
     <Description>Start Redis from .NET for integration tests. Contains redis runtime embedded in the dll.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <ProjectUrl>https://github.com/AndMu/redis-inside</ProjectUrl>
-    <tags>redis, integration, redis-64, caching</tags>
+    <tags>redis, integration, redis-64, caching, NETSTANDARD</tags>
   </PropertyGroup>
 
   <ItemGroup>
