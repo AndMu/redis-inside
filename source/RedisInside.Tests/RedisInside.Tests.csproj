@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>Wikiled.Redis.Inside</AssemblyName>
+    <AssemblyName>RedisInside.Tests</AssemblyName>
     <Authors>Wikiled</Authors>
     <Description>Start Redis from .NET for integration tests. Contains redis runtime embedded in the dll.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
