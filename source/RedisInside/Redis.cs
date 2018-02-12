@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using StackExchange.Redis;
 
 namespace RedisInside
 {
@@ -19,30 +20,38 @@ namespace RedisInside
 
         private bool disposed;
 
+        private ConnectionMultiplexer multiplexer;
+
         public Redis(Action<IConfig> configuration = null)
         {
             configuration?.Invoke(config);
 
             executable = new TemporaryFile(GetType().GetTypeInfo().Assembly.GetManifestResourceStream("RedisInside.Executables.redis-server.exe"), "exe");
-            
+
             var processStartInfo = new ProcessStartInfo(" \"" + executable.Info.FullName + " \"")
-                                   {
-                                       UseShellExecute = false,
-                                       Arguments = $"--port {config.SelectedPort} --bind {config.Host} --persistence-available no",
-                                       CreateNoWindow = true,
-                                       LoadUserProfile = false,
-                                       RedirectStandardError = true,
-                                       RedirectStandardOutput = true,
-                                       StandardOutputEncoding = Encoding.ASCII
-                                   };
+            {
+                UseShellExecute = false,
+                Arguments = $"--port {config.SelectedPort} --persistence-available no",
+                CreateNoWindow = true,
+                LoadUserProfile = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                StandardOutputEncoding = Encoding.ASCII
+            };
 
             process = Process.Start(processStartInfo);
             process.ErrorDataReceived += (sender, eventargs) => config.Logger.Invoke(eventargs.Data);
             process.OutputDataReceived += (sender, eventargs) => config.Logger.Invoke(eventargs.Data);
             process.BeginOutputReadLine();
+            CheckStatus();
         }
 
         public EndPoint Endpoint => new IPEndPoint(IPAddress.Loopback, config.SelectedPort);
+
+        private void CheckStatus()
+        {
+            multiplexer = ConnectionMultiplexer.Connect($"{Endpoint},allowAdmin = true");
+        }
 
         public void Dispose()
         {
@@ -50,12 +59,21 @@ namespace RedisInside
             GC.SuppressFinalize(this);
         }
 
-
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)
             {
                 return;
+            }
+
+            try
+            {
+                multiplexer.GetServer(Endpoint).Shutdown();
+                multiplexer.Dispose();
+            }
+            catch (Exception ex)
+            {
+                config.Logger(ex.ToString());
             }
 
             try

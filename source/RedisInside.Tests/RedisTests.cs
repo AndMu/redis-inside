@@ -59,7 +59,6 @@ namespace RedisInside.Tests
         [Test]
         public async Task CanStartSlave()
         {
-
             using (var redis = new Redis())
             using (var redis2 = new Redis())
             {
