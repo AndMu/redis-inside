@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using StackExchange.Redis;
@@ -21,7 +22,7 @@ namespace RedisInside.Tests
         public void CanStart()
         {
             using (var redis = new Redis())
-            using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
+            using (var client = ConnectionMultiplexer.Connect(GetConfiguration(redis)))
             {
                 client.GetDatabase().StringSet("key", "value");
                 var value = client.GetDatabase().StringGet("key");
@@ -34,7 +35,7 @@ namespace RedisInside.Tests
         public void CanStartWithPersistence(string fileName)
         {
             using (var redis = new Redis(i => i.WithPersistence(fileName)))
-            using (var client = ConnectionMultiplexer.Connect(redis.Endpoint.ToString()))
+            using (var client = ConnectionMultiplexer.Connect(GetConfiguration(redis)))
             {
                 client.GetDatabase().StringSet("key", "value");
                 var value = client.GetDatabase().StringGet("key");
@@ -47,11 +48,10 @@ namespace RedisInside.Tests
         {
             using (var redis = new Redis())
             using (var redis2 = new Redis())
-            using (var client = ConnectionMultiplexer.Connect(redis.Endpoint + "," + redis2.Endpoint))
+            using (var client = ConnectionMultiplexer.Connect(GetConfiguration(redis, redis2)))
             {
                 client.GetDatabase().StringSet("key", "value");
                 var value = client.GetDatabase().StringGet("key");
-
                 Assert.That(value.ToString(), Is.EqualTo("value"));
             }
         }
@@ -64,26 +64,41 @@ namespace RedisInside.Tests
             {
                 ////Arrange
                 // configure slave
-                var config = new ConfigurationOptions { AllowAdmin = true };
-                config.EndPoints.Add(redis.Endpoint);
-                config.EndPoints.Add(redis2.Endpoint);
-                using (var client = ConnectionMultiplexer.Connect(config))
+                using (var client = ConnectionMultiplexer.Connect(GetConfiguration(redis, redis2)))
                 {
                     await client.GetServer(redis.Endpoint).SlaveOfAsync(redis2.Endpoint).ConfigureAwait(false);
                 }
 
                 // new single-node client
                 string actualValue;
-                using (var client = ConnectionMultiplexer.Connect(redis2.Endpoint.ToString()))
+                using (var client = ConnectionMultiplexer.Connect(GetConfiguration(redis2)))
                 {
-
                     await client.GetDatabase().StringSetAsync("key", "value").ConfigureAwait(false);
-
                     actualValue = await client.GetDatabase().StringGetAsync("key").ConfigureAwait(false);
                 }
 
                 Assert.That(actualValue, Is.EqualTo("value"));
             }
+        }
+
+        private ConfigurationOptions GetConfiguration(params Redis[] redis)
+        {
+            var config = new ConfigurationOptions
+            {
+                AbortOnConnectFail = false,
+                AllowAdmin = true,
+                KeepAlive = 60,
+                ConnectTimeout = 5000,
+                SyncTimeout = 5000,
+                ResponseTimeout = 10000
+            };
+
+            foreach (var item in redis)
+            {
+                config.EndPoints.Add(item.Endpoint);
+            }
+
+            return config;
         }
     }
 }

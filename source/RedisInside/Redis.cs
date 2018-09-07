@@ -28,7 +28,6 @@ namespace RedisInside
             configuration?.Invoke(config);
 
             executable = new TemporaryFile(GetType().GetTypeInfo().Assembly.GetManifestResourceStream("RedisInside.Executables.redis-server.exe"), "exe");
-
             var processStartInfo = new ProcessStartInfo(" \"" + executable.Info.FullName + " \"")
             {
                 UseShellExecute = false,
@@ -41,8 +40,8 @@ namespace RedisInside
             };
 
             process = Process.Start(processStartInfo);
-            process.ErrorDataReceived += (sender, eventargs) => config.Logger.Invoke(eventargs.Data);
-            process.OutputDataReceived += (sender, eventargs) => config.Logger.Invoke(eventargs.Data);
+            process.ErrorDataReceived += (sender, args) => config.Logger.Invoke(args.Data);
+            process.OutputDataReceived += (sender, args) => config.Logger.Invoke(args.Data);
             process.BeginOutputReadLine();
             CheckStatus();
         }
@@ -51,7 +50,14 @@ namespace RedisInside
 
         private void CheckStatus()
         {
-            multiplexer = ConnectionMultiplexer.Connect($"{Endpoint},allowAdmin = true");
+            ConfigurationOptions option = new ConfigurationOptions
+            {
+                AbortOnConnectFail = false,
+                EndPoints = { Endpoint },
+                AllowAdmin = false
+            };
+
+            multiplexer = ConnectionMultiplexer.Connect(option);
         }
 
         public void Dispose()

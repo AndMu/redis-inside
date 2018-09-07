@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>NETSTANDARD2.0</TargetFramework>
@@ -19,15 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Executables\redis-server.exe" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="StackExchange.Redis" Version="1.2.6" />
+    <PackageReference Include="StackExchange.Redis" Version="2.0.495" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
   </ItemGroup>
