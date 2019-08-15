@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>NET472</TargetFrameworks>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
@@ -20,6 +20,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.14.0" />
     <PackageReference Include="StackExchange.Redis" version="2.0.601" />
     <PackageReference Include="System.IO.Pipelines" Version="4.5.3" />
+    <packagereference Include="Microsoft.NET.Test.Sdk" Version="16.1.0"></packagereference>
   </ItemGroup>
 
   <ItemGroup>
