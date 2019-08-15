@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using StackExchange.Redis;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace RedisInside.Tests
 {
@@ -90,7 +89,6 @@ namespace RedisInside.Tests
                 KeepAlive = 60,
                 ConnectTimeout = 5000,
                 SyncTimeout = 5000,
-                ResponseTimeout = 10000
             };
 
             foreach (var item in redis)

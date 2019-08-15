@@ -50,11 +50,11 @@ namespace RedisInside
 
         private void CheckStatus()
         {
-            ConfigurationOptions option = new ConfigurationOptions
+            var option = new ConfigurationOptions
             {
                 AbortOnConnectFail = false,
                 EndPoints = { Endpoint },
-                AllowAdmin = false
+                AllowAdmin = true
             };
 
             multiplexer = ConnectionMultiplexer.Connect(option);
@@ -114,7 +114,7 @@ namespace RedisInside
             try
             {
                 process.CancelOutputRead();
-                config.Logger("Redis was started for this test run. Shuting down");
+                config.Logger("Redis was started for this test run. Shutting down");
                 if (process != null)
                 {
                     if (process.HasExited)
