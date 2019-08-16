@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using Polly;
 using StackExchange.Redis;
 
 namespace RedisInside
@@ -77,7 +79,17 @@ namespace RedisInside
             {
                 StopServer();
                 ShutdownProcess();
-                DeleteFiles();
+
+                Policy
+                   .Handle<Exception>()
+                   .WaitAndRetry(new[]
+                                 {
+                                     TimeSpan.FromSeconds(1),
+                                     TimeSpan.FromSeconds(2),
+                                     TimeSpan.FromSeconds(3)
+                                 },
+                                 (exception, timeSpan) => { config.Logger($"Failed to delete files..."); })
+                   .Execute(DeleteFiles);
             }
 
             disposed = true;
