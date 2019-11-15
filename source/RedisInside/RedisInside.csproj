@@ -23,10 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Polly" Version="7.1.0" />
+    <PackageReference Include="Polly" Version="7.1.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
+    <PackageReference Include="Wikiled.Common.Utilities" Version="1.2.27" />
   </ItemGroup>
 
 </Project>

@@ -29,6 +29,18 @@ namespace RedisInside.Tests
             }
         }
 
+        [Test]
+        public void WithLocation()
+        {
+            using (var redis = new Redis(i => i.WithLocation(TestContext.CurrentContext.TestDirectory)))
+            using (var client = ConnectionMultiplexer.Connect(GetConfiguration(redis)))
+            {
+                client.GetDatabase().StringSet("key", "value");
+                var value = client.GetDatabase().StringGet("key");
+                Assert.That(value.ToString(), Is.EqualTo("value"));
+            }
+        }
+
         [TestCase(null)]
         [TestCase("dump1")]
         public void CanStartWithPersistence(string fileName)

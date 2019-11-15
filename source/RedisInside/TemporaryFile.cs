@@ -7,21 +7,23 @@ namespace RedisInside
     {
         private bool disposed;
 
-        public TemporaryFile(string extension = "tmp")
+        public TemporaryFile(string target, string extension = "tmp")
         {
-            Info = new FileInfo(Path.Combine(Path.GetTempPath(), "Wikiled.RedisInside" + "." + extension));
+            Info = new FileInfo(Path.Combine(target, "Wikiled.RedisInside" + "." + extension));
         }
 
-        public TemporaryFile(Stream stream, string extension = "tmp")
-            : this(extension)
+        public TemporaryFile(Stream stream, string target, string extension = "tmp")
+            : this(target, extension)
         {
-            if (!Info.Exists)
+            if (Info.Exists)
             {
-                using (stream)
-                using (var destination = Info.OpenWrite())
-                {
-                    stream.CopyTo(destination);
-                }
+                return;
+            }
+
+            using (stream)
+            using (var destination = Info.OpenWrite())
+            {
+                stream.CopyTo(destination);
             }
         }
 

@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Polly;
+using StackExchange.Redis;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Threading;
-using Polly;
-using StackExchange.Redis;
 
 namespace RedisInside
 {
@@ -29,7 +28,7 @@ namespace RedisInside
         {
             configuration?.Invoke(config);
 
-            executable = new TemporaryFile(GetType().GetTypeInfo().Assembly.GetManifestResourceStream("RedisInside.Executables.redis-server.exe"), "exe");
+            executable = new TemporaryFile(GetType().GetTypeInfo().Assembly.GetManifestResourceStream("RedisInside.Executables.redis-server.exe"), config.Location, "exe");
             var processStartInfo = new ProcessStartInfo(" \"" + executable.Info.FullName + " \"")
             {
                 UseShellExecute = false,

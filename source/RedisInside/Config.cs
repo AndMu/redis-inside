@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
+using Wikiled.Common.Extensions;
 
 namespace RedisInside
 {
@@ -9,6 +11,8 @@ namespace RedisInside
         private static readonly Random random = new Random();
 
         private static readonly ConcurrentDictionary<int, byte> usedPorts = new ConcurrentDictionary<int, byte>();
+
+        private string location;
 
         public Config()
         {
@@ -26,6 +30,12 @@ namespace RedisInside
 
         public int SelectedPort { get; private set; }
 
+        public string Location
+        {
+            get => location ?? Path.GetTempPath();
+            private set => location = value;
+        }
+
         public bool IsWithPersistence { get; private set; }
 
         public string PersistenceFile { get; private set; }
@@ -41,6 +51,18 @@ namespace RedisInside
 
             PersistenceFile = fileName;
             IsWithPersistence = true;
+            return this;
+        }
+
+        public IConfig WithLocation(string directory = null)
+        {
+            if (!string.IsNullOrEmpty(directory))
+            {
+                directory = Path.Combine(directory, "RedisInside", DateTime.UtcNow.Ticks.ToString());
+                directory.EnsureDirectoryExistence();
+            }
+
+            Location = directory;
             return this;
         }
 

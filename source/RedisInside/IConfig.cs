@@ -9,5 +9,7 @@ namespace RedisInside
         IConfig LogTo(Action<string> logFunction);
 
         IConfig WithPersistence(string fileName = null);
+
+        IConfig WithLocation(string directory = null);
     }
 }
