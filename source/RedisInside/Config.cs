@@ -54,11 +54,11 @@ namespace RedisInside
             return this;
         }
 
-        public IConfig WithLocation(string directory = null)
+        public IConfig WithLocation(string directory = null, bool randomName = true)
         {
             if (!string.IsNullOrEmpty(directory))
             {
-                directory = Path.Combine(directory, "RedisInside", DateTime.UtcNow.Ticks.ToString());
+                directory = Path.Combine(directory, "RedisInside", randomName ? DateTime.UtcNow.Ticks.ToString() : "Server");
                 directory.EnsureDirectoryExistence();
             }
 

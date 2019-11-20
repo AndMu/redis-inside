@@ -87,7 +87,7 @@ namespace RedisInside
                                      TimeSpan.FromSeconds(2),
                                      TimeSpan.FromSeconds(3)
                                  },
-                                 (exception, timeSpan) => { config.Logger($"Failed to delete files..."); })
+                                 (exception, timeSpan) => { config.Logger("Failed to delete files..."); })
                    .Execute(DeleteFiles);
             }
 

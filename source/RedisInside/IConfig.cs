@@ -10,6 +10,6 @@ namespace RedisInside
 
         IConfig WithPersistence(string fileName = null);
 
-        IConfig WithLocation(string directory = null);
+        IConfig WithLocation(string directory = null, bool randomName = true);
     }
 }
