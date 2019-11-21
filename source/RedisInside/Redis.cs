@@ -105,7 +105,14 @@ namespace RedisInside
 
             foreach (var redis in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(executable.Info.Name)))
             {
-                redis.Kill();
+                try
+                {
+                    redis.Kill();
+                }
+                catch (Exception e)
+                {
+                    config.Logger(e.Message);
+                }
             }
         }
 
