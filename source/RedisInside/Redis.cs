@@ -98,6 +98,11 @@ namespace RedisInside
 
         private void Kill()
         {
+            if (!config.Kill)
+            {
+                return;
+            }
+
             foreach (var redis in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(executable.Info.Name)))
             {
                 redis.Kill();

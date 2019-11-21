@@ -38,6 +38,8 @@ namespace RedisInside
 
         public bool IsWithPersistence { get; private set; }
 
+        public bool Kill { get; private set; }
+
         public string PersistenceFile { get; private set; }
 
         public string Persistence => !IsWithPersistence ? "persistence-available no" : $"dbfilename {PersistenceFile}";
@@ -54,7 +56,13 @@ namespace RedisInside
             return this;
         }
 
-        public IConfig WithLocation(string directory = null, bool randomName = true)
+        public IConfig KillAll()
+        {
+            Kill = true;
+            return this;
+        }
+
+        public IConfig WithLocation(string directory = null, bool randomName = false)
         {
             if (!string.IsNullOrEmpty(directory))
             {

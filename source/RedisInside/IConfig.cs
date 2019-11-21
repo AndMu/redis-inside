@@ -6,10 +6,12 @@ namespace RedisInside
     {
         IConfig Port(int portNumber);
 
+        IConfig KillAll();
+
         IConfig LogTo(Action<string> logFunction);
 
         IConfig WithPersistence(string fileName = null);
 
-        IConfig WithLocation(string directory = null, bool randomName = true);
+        IConfig WithLocation(string directory = null, bool randomName = false);
     }
 }
