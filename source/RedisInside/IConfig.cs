@@ -8,6 +8,8 @@ namespace RedisInside
 
         IConfig KillAll();
 
+        IConfig DisableCheck();
+
         IConfig LogTo(Action<string> logFunction);
 
         IConfig WithPersistence(string fileName = null);

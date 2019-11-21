@@ -18,10 +18,16 @@ namespace RedisInside
         {
             do
             {
-                SelectedPort = random.Next(49152, 65535 + 1);
+                SelectedPort = random.Next(60000, 65535 + 1);
+                var isOpen = NetworkExtensions.ScanPort(SelectedPort).Result;
+                if (isOpen)
+                {
+                    usedPorts.AddOrUpdate(SelectedPort, i => byte.MinValue, (i, b) => byte.MinValue);
+                }
+
+                Logger?.Invoke($"Trying port {SelectedPort}({isOpen})");
             }
             while (usedPorts.ContainsKey(SelectedPort));
-
             usedPorts.AddOrUpdate(SelectedPort, i => byte.MinValue, (i, b) => byte.MinValue);
             Logger = message => Debug.WriteLine(message);
         }
@@ -29,6 +35,8 @@ namespace RedisInside
         public Action<string> Logger { get; private set; }
 
         public int SelectedPort { get; private set; }
+
+        public bool CheckStatus { get; private set; } = true;
 
         public string Location
         {
@@ -59,6 +67,12 @@ namespace RedisInside
         public IConfig KillAll()
         {
             Kill = true;
+            return this;
+        }
+
+        public IConfig DisableCheck()
+        {
+            CheckStatus = false;
             return this;
         }
 

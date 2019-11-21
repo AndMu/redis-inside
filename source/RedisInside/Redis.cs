@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Polly;
 using StackExchange.Redis;
 
@@ -49,10 +50,45 @@ namespace RedisInside
             process.ErrorDataReceived += (sender, args) => Log(args.Data);
             process.OutputDataReceived += (sender, args) => Log(args.Data);
             process.BeginOutputReadLine();
-            CheckStatus();
+
+            if (process.HasExited)
+            {
+                throw new Exception("Failed to start service");
+            }
+
+            if (config.CheckStatus)
+            {
+                var result = CheckStatus().Result;
+            }
         }
 
         public EndPoint Endpoint => new IPEndPoint(IPAddress.Loopback, config.SelectedPort);
+
+        public async Task<bool> CheckStatus()
+        {
+            var option = new ConfigurationOptions
+            {
+                AbortOnConnectFail = true,
+                EndPoints = { Endpoint },
+                AllowAdmin = true
+            };
+
+            Log("Connecting");
+
+            multiplexer = await Policy
+                                .Handle<Exception>()
+                                .WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
+                                                   (exception, timeSpan) => { Log("Failed to delete files..."); })
+                                .ExecuteAsync(() => ConnectionMultiplexer.ConnectAsync(option)).ConfigureAwait(false);
+
+            while (multiplexer.IsConnecting)
+            {
+                await Task.Delay(500).ConfigureAwait(false);
+            }
+
+            Log("Connected!");
+            return true;
+        }
 
         public void Dispose()
         {
@@ -65,19 +101,7 @@ namespace RedisInside
             config.Logger?.Invoke(message);
         }
 
-        private void CheckStatus()
-        {
-            var option = new ConfigurationOptions
-            {
-                AbortOnConnectFail = true,
-                EndPoints = { Endpoint },
-                AllowAdmin = true
-            };
-
-            multiplexer = ConnectionMultiplexer.Connect(option);
-            var status = multiplexer.GetStatus();
-        }
-
+        
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)
@@ -190,6 +214,12 @@ namespace RedisInside
         private void StopServer()
         {
             Log("StopServer");
+
+            if (!config.CheckStatus)
+            {
+                return;
+            }
+
             try
             {
                 multiplexer.GetServer(Endpoint).Shutdown();
