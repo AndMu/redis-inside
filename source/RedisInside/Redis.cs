@@ -69,7 +69,22 @@ namespace RedisInside
             return Policy.Handle<Exception>()
                          .WaitAndRetry(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
                                        (exception, timeSpan) => { })
-                         .Execute(() => new Redis(configuration));
+                         .Execute(() =>
+                         {
+                             Redis instance = null;
+
+                             try
+                             {
+                                 instance = new Redis(configuration);
+                             }
+                             catch (Exception)
+                             {
+                                 instance?.Dispose();
+                                 throw;
+                             }
+
+                             return instance;
+                         });
         }
 
         public async Task<bool> CheckStatus()
