@@ -96,12 +96,12 @@ namespace RedisInside
                 AllowAdmin = true
             };
 
-            Log("Connecting");
+            Log("Connecting...");
 
             multiplexer = await Policy
                                 .Handle<Exception>()
                                 .WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
-                                                   (exception, timeSpan) => { Log("Failed to Connect..."); })
+                                                   (exception, timeSpan) => { Log("Failed to Connect!"); })
                                 .ExecuteAsync(() => ConnectionMultiplexer.ConnectAsync(option)).ConfigureAwait(false);
 
             while (multiplexer.IsConnecting)
@@ -145,7 +145,7 @@ namespace RedisInside
             Policy
                 .Handle<Exception>()
                 .WaitAndRetry(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
-                              (exception, timeSpan) => { Log("Failed to delete files..."); })
+                              (exception, timeSpan) => { Log("Failed to delete files!"); })
                 .Execute(DeleteFiles);
             disposed = true;
         }
@@ -166,7 +166,7 @@ namespace RedisInside
                 }
                 catch (Exception e)
                 {
-                    Log(e.Message);
+                    Log(e.ToString());
                 }
             }
         }
