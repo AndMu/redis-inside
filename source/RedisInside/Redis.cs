@@ -40,6 +40,7 @@ namespace RedisInside
                 StandardOutputEncoding = Encoding.ASCII
             };
 
+            Kill();
             process = Process.Start(processStartInfo);
             process.ErrorDataReceived += (sender, args) => config.Logger.Invoke(args.Data);
             process.OutputDataReceived += (sender, args) => config.Logger.Invoke(args.Data);
@@ -78,6 +79,7 @@ namespace RedisInside
             {
                 StopServer();
                 ShutdownProcess();
+                Kill();
 
                 Policy
                    .Handle<Exception>()
@@ -92,6 +94,14 @@ namespace RedisInside
             }
 
             disposed = true;
+        }
+
+        private void Kill()
+        {
+            foreach (var redis in Process.GetProcessesByName(Path.GetFileNameWithoutExtension(executable.Info.Name)))
+            {
+                redis.Kill();
+            }
         }
 
         private void DeleteFiles()
