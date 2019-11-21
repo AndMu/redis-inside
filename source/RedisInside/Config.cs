@@ -18,7 +18,7 @@ namespace RedisInside
         {
             do
             {
-                SelectedPort = random.Next(60000, 65535 + 1);
+                SelectedPort = random.Next(8000, 55535 + 1);
                 var isOpen = NetworkExtensions.ScanPort(SelectedPort).Result;
                 if (isOpen)
                 {

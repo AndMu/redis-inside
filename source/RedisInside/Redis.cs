@@ -64,6 +64,14 @@ namespace RedisInside
 
         public EndPoint Endpoint => new IPEndPoint(IPAddress.Loopback, config.SelectedPort);
 
+        public static Redis CreateRedis(Action<IConfig> configuration)
+        {
+            return Policy.Handle<Exception>()
+                         .WaitAndRetry(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
+                                       (exception, timeSpan) => { })
+                         .Execute(() => new Redis(configuration));
+        }
+
         public async Task<bool> CheckStatus()
         {
             var option = new ConfigurationOptions
@@ -78,7 +86,7 @@ namespace RedisInside
             multiplexer = await Policy
                                 .Handle<Exception>()
                                 .WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3) },
-                                                   (exception, timeSpan) => { Log("Failed to delete files..."); })
+                                                   (exception, timeSpan) => { Log("Failed to Connect..."); })
                                 .ExecuteAsync(() => ConnectionMultiplexer.ConnectAsync(option)).ConfigureAwait(false);
 
             while (multiplexer.IsConnecting)
